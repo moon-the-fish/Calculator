@@ -1,0 +1,59 @@
+#container{
+    display: flex;
+    flex-flow: column;
+    border: 3px solid red;
+    margin-top: 150px;
+    padding: 15px;
+    gap: 20px;
+
+}
+.touchpad-div{
+    display: flex;
+    flex-flow: column;
+    border: 3px solid yellow;
+    flex:1;
+
+
+}
+#display{
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-end;
+    flex: 1 1 150px;
+    border: hotpink;
+    border-radius: 10px;
+    background-color: black;
+}
+.first-div{
+    flex:1;
+}
+
+.num-row,.operator-row{
+    display: flex;
+    flex-flow: row;
+    margin: 10px;
+    gap:8px;
+    flex:1;
+
+}
+#eq{
+    flex:1;
+}
+#equals{
+    flex: 1;
+}
+#touchpad{
+    display: flex;
+    flex-flow: row;
+    gap: 30px;
+    flex: 1;
+}
+.Number,.operator,.function{
+
+    flex:1;
+}
+#added-div{
+    align-self: center;
+    font-size: 40px;
+    color: deeppink;
+}
