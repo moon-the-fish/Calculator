@@ -5,6 +5,7 @@ const status={
     SND:false,
 
 }
+
 const numberBtns = document.querySelectorAll(".Number");
 const operatorBtns = document.querySelectorAll(".operator")
 const equalbtn =document.querySelector("#eq");
@@ -29,6 +30,9 @@ equalbtn.addEventListener('click',equalsClick);
 clearBtn.addEventListener('click',clearClick);
 backspaceBtn.addEventListener('click',backspaceClick);
 decimalBtn.addEventListener('click',decimalClick);
+document.addEventListener('keydown',(e)=>{
+    keyboardClick(e.key);
+})
 
 // functions
 function createDiv(divId){
@@ -167,7 +171,7 @@ function backspaceClick(){
 
         }
         else if(div.childNodes.length>1){
-            if(div.lastChild ==="."){
+            if(div.lastChild.textContent==="."){
                 status.SND=false;
             }
             div.removeChild(div.lastChild);
@@ -193,4 +197,24 @@ function decimalClick(){
         status.SND=true;
 
     }
+}
+function keyboardClick(key){
+    const operators = ["-","+","/","x"]
+    if(!isNaN(key)){
+        numberClick(key);
+    }
+    else if (operators.includes(key)){
+        operatorClick(key);
+    }
+    else if(key==="."){
+        decimalClick();
+    }
+    else if(key==='Backspace'){
+        backspaceClick();
+    }
+    else if(key==='Enter'|| key==="="){
+        equalsClick();
+    }
+
+
 }
