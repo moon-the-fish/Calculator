@@ -1,5 +1,4 @@
 
-// Variables
 const status={
     state:"start",
     FND:false,
@@ -56,6 +55,7 @@ function restartDecimalState(){
 }
 function numberClick(num){
     if(status.state==="start"){
+        removeStartDisplay()
         createDiv("first-num");
         addContent(num,"first-num");
         status.state = "FN-input";
@@ -73,8 +73,10 @@ function numberClick(num){
     }
     else if (status.state==="results-display"){
         clearDisplay();
-        status.state="start";
-        numberClick(num);
+        createDiv("first-num");
+        addContent(num,"first-num");
+        status.state = "FN-input";
+
     }
 }
 function setOperator(opp){
@@ -123,7 +125,7 @@ function operate(fn,o,sn){
             break;
         case "/":
             if(sn===0){
-                displayResults("Come on Bro=_=");
+                divideByZero();
             }
             else{
                 displayResults(fn/sn);}
@@ -149,6 +151,7 @@ function clearClick(){
     clearDisplay();
     status.state="start";
     restartDecimalState();
+    startDisplay();
 }
 function backspaceClick(){
     if(status.state==="FN-input"){
@@ -201,7 +204,11 @@ function decimalClick(){
 }
 function keyboardClick(key){
     const operators = ["-","+","/","x"]
-    if(!isNaN(key)){
+    if(key===" "){
+    }
+
+    else if(!isNaN(key)){
+
         numberClick(key);
     }
     else if (operators.includes(key)){
@@ -219,4 +226,26 @@ function keyboardClick(key){
 
 
 }
+function startDisplay(){
+    const startdisplay = document.createElement('div')
+    startdisplay.classList.add("display-div")
+    startdisplay.id='start-div';
+    startdisplay.textContent="0";
+    displayScreen.appendChild(startdisplay);
+}
+function removeStartDisplay(){
+    const start = document.getElementById('start-div');
+    displayScreen.removeChild(start);
+}
+function divideByZero(){
+    clearDisplay();
+    const div = document.createElement('div')
+    div.classList.add("display-div")
+    div.id='start-div';
+    div.textContent="Bro =_=";
+    displayScreen.appendChild(div);
+    status.state="start";
 
+
+}
+startDisplay();
