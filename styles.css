@@ -52,8 +52,10 @@
 
     flex:1;
 }
-#added-div{
+.display-div{
     align-self: center;
     font-size: 40px;
     color: deeppink;
+
+
 }

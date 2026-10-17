@@ -1,131 +1,196 @@
-const displayContent={
-    firstNum:null,
-    midoperator:null,
-    secondNum:null,
-    result:null,
+// Variables
+const status={
+    state:"start",
+    FND:false,
+    SND:false,
+
 }
 const numberBtns = document.querySelectorAll(".Number");
 const operatorBtns = document.querySelectorAll(".operator")
 const equalbtn =document.querySelector("#eq");
 const clearBtn = document.querySelector("#clear")
+const decimalBtn = document.querySelector('#point');
+const backspaceBtn =document.querySelector("#back");
+const displayScreen = document.querySelector("#display");
 
 // button events
-clearBtn.addEventListener("click",()=>{
-    clearDisplay();
-    displayContent.result=null;
-    displayContent.firstNum=null;
-    displayContent.secondNum=null;
-    displayContent.midoperator=null;
-})
-
-
-equalbtn.addEventListener('click',operate);
-
 numberBtns.forEach((btn)=>{
-        btn.addEventListener('click',(e)=> {
-                if(numberChecker(e.target.innerHTML)) {
-                    addToDisplay(e.target.innerHTML)
-                }
+    btn.addEventListener('click',(e)=> {
+        numberClick(e.target.innerHTML);
 
-            }
-        )
-
-    }
-)
-
+    })
+})
 operatorBtns.forEach((btn)=>{
-        btn.addEventListener('click',(e)=>{
-                if(operatorChecker(e.target.innerHTML)){
-                    addToDisplay(e.target.innerHTML)}
-            }
-        )
+    btn.addEventListener('click',(e)=>{
+        operatorClick(e.target.innerHTML)
+    })
+})
+equalbtn.addEventListener('click',equalsClick);
+clearBtn.addEventListener('click',clearClick);
+backspaceBtn.addEventListener('click',backspaceClick);
+decimalBtn.addEventListener('click',decimalClick);
 
-    }
-)
-
-//functions
-
-function addToDisplay(content){
-    const displayScreen = document.querySelector("#display");
-    const newDiv = document.createElement("div")
-    newDiv.id="added-div";
-    newDiv.textContent=content;
+// functions
+function createDiv(divId){
+    const newDiv = document.createElement('div');
+    newDiv.classList.add("display-div");
+    newDiv.id=divId;
     displayScreen.appendChild(newDiv);
 
 }
-function displayResults(content){
+function addContent(content,divId){
+    const newContent = document.createTextNode(content);
+    const parentDiv = document.getElementById(divId);
+    parentDiv.appendChild(newContent);
+
+}
+function restartDecimalState(){
+    status.FND=false;
+    status.SND=false;
+
+}
+function numberClick(num){
+    if(status.state==="start"){
+        createDiv("first-num");
+        addContent(num,"first-num");
+        status.state = "FN-input";
+    }
+    else if(status.state==="FN-input"){
+        addContent(num,"first-num")
+    }
+    else if(status.state==="OP-input"){
+        createDiv("second-num");
+        addContent(num,"second-num");
+        status.state="SN-input";
+    }
+    else if(status.state==="SN-input"){
+        addContent(num,"second-num");
+    }
+    else if (status.state==="results-display"){
+        clearDisplay();
+        status.state="start";
+        numberClick(num);
+    }
+}
+function setOperator(opp){
+    const parentDiv = document.getElementById("mid-operator");
+    parentDiv.textContent=opp;
+
+}
+function operatorClick(opp){
+    if(status.state==="FN-input"){
+        createDiv("mid-operator");
+        setOperator(opp);
+        status.state="OP-input";
+
+    }else if(status.state==="OP-input"){
+        setOperator(opp);
+    }
+    else if (status.state==="results-display"){
+        const results = document.getElementById('results');
+        results.id="first-num";
+        status.state='FN-input';
+        operatorClick(opp);
+
+
+    }
+}
+
+function equalsClick(){
+    if(status.state==='SN-input') {
+        let firstNumber = Number(document.getElementById("first-num").textContent);
+        let secondNumber = Number(document.getElementById("second-num").textContent);
+        let operator = document.getElementById("mid-operator").textContent;
+        operate(firstNumber, operator, secondNumber);
+    }
+
+}
+function operate(fn,o,sn){
+    switch (o){
+        case "+":
+            displayResults(fn+sn);
+            break;
+        case "x":
+            displayResults(fn*sn);
+            break;
+        case "-":
+            displayResults(fn-sn);
+            break;
+        case "/":
+            if(sn===0){
+                displayResults("Come on Bro=_=");
+            }
+            else{
+                displayResults(fn/sn);}
+            break;
+
+    }
+}
+function displayResults(result){
     clearDisplay();
-    const displayScreen = document.querySelector("#display");
-    const newDiv = document.createElement("div")
-    newDiv.id="added-div";
-    newDiv.textContent=content;
-    displayScreen.appendChild(newDiv);
+    createDiv("results");
+    addContent(+(result).toFixed(3),"results");
+    status.state="results-display"
+    restartDecimalState();
 
 }
 function clearDisplay(){
-    const displayScreen = document.querySelector("#display");
     while(displayScreen.hasChildNodes()){
         displayScreen.removeChild(displayScreen.firstChild)
     }
 
 }
-
-
-
-function numberChecker(num){
-    if (displayContent.midoperator==null&& displayContent.firstNum!=null){
-        displayContent.firstNum = `${displayContent.firstNum}${num}`
-        return true
+function clearClick(){
+    clearDisplay();
+    status.state="start";
+    restartDecimalState();
+}
+function backspaceClick(){
+    if(status.state==="FN-input"){
+        const div = document.getElementById('first-num');
+        if(div.childNodes.length===1){
+            displayScreen.removeChild(div);
+            status.state='start';
+        }
+        else if(div.childNodes.length>1){
+            if(div.lastChild.textContent ==="."){
+                status.FND=false;
+            }
+            div.removeChild(div.lastChild);
+        }
     }
-    else if(displayContent.firstNum==null&& displayContent.result==null){
-        displayContent.firstNum=num;
-        return true
-    }
-    else if (displayContent.midoperator!=null && displayContent.secondNum!=null){
-        displayContent.secondNum = `${displayContent.secondNum}${num}`
-        console.log(displayContent.secondNum);
-        return true
+    else if (status.state==="SN-input"){
+        const div = document.getElementById('second-num');
+        if(div.childNodes.length===1){
+            displayScreen.removeChild(div);
+            status.state='OP-input';
+
+        }
+        else if(div.childNodes.length>1){
+            if(div.lastChild ==="."){
+                status.SND=false;
+            }
+            div.removeChild(div.lastChild);
+        }
 
     }
-    else if (displayContent.midoperator!=null && displayContent.secondNum==null){
-        displayContent.secondNum = num;
-
-        return true
-
+    else if (status.state==="OP-input"){
+        const div = document.getElementById('mid-operator');
+        displayScreen.removeChild(div);
+        status.state='FN-input';
     }
-
-
 
 }
-function operatorChecker(opp){
-    if (displayContent.midoperator==null&& displayContent.firstNum!=null){
-        displayContent.midoperator=opp
-        console.log(displayContent.firstNum)
-        return true
-    }
+function decimalClick(){
 
-}
-function operate(){
-    let x = Number(displayContent.firstNum);
-    let y = Number(displayContent.secondNum);
-    switch (displayContent.midoperator){
-        case "+":
-            displayContent.result=x+y;
-            displayResults(displayContent.result);
-            break;
-        case "x":
-            displayContent.result=x*y;
-            displayResults(displayContent.result);
-            break;
-        case "-":
-            displayContent.result=x-y;
-            displayResults(displayContent.result);
-            break;
-        case "/":
-            displayContent.result=x/y;
-            displayResults(displayContent.result);
-            break;
+    if(status.state==="FN-input"&& status.FND===false){
+        addContent(".","first-num");
+        status.FND=true;
 
     }
+    else if(status.state==="SN-input" && status.SND===false){
+        addContent(".","second-num");
+        status.SND=true;
 
+    }
 }
